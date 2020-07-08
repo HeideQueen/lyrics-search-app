@@ -17,7 +17,52 @@ async function searchSongs(term) {
 }
 
 // show song and artist in DOM
-function showData(data) {}
+function showData(data) {
+  result.innerHTML = `
+    <ul class='songs'>
+      ${data.data
+        .map(
+          (song) =>
+            `
+         <li>
+            <span><strong>${song.artist.name}</strong> - ${song.title}</span>
+            <button class='btn' data-artist='${song.artist.name}' data-songtitle='${song.title}'>Get Lyrics</button>
+         </li>
+        `
+        )
+        .join('')}
+    </ul>
+  `;
+
+  if (data.prev || data.next) {
+    more.innerHTML = `
+      ${
+        data.prev
+          ? `<button class='btn' onclick='getMoreSongs("${data.prev}")'>Previous</button>`
+          : ''
+      }
+      ${
+        data.next
+          ? `<button class='btn' onclick='getMoreSongs("${data.next}")'>Next</button>`
+          : ''
+      }
+    `;
+  } else {
+    more.innerHTML = '';
+  }
+}
+
+// get prev and next results
+async function getMoreSongs(url) {
+  try {
+    const res = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
+    const data = await res.json();
+
+    showData(data);
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 // Event listeners
 form.addEventListener('submit', (e) => {
